@@ -32,8 +32,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
-        run: uv pip install -e ".[dev]"
+      - name: Create venv and install dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
 
       - name: Run tests
         run: uv run pytest tests/ -v --cov=goldenpath_cli --cov-report=xml
@@ -61,8 +63,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
-        run: uv pip install -e ".[dev]"
+      - name: Create venv and install dependencies
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
 
       - name: Ruff check
         run: uv run ruff check src/ tests/
@@ -83,16 +87,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
 
       - name: Install dependencies
         run: pnpm install
@@ -115,16 +119,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
 
       - name: Install dependencies
         run: pnpm install
@@ -151,10 +155,12 @@ jobs:
       - name: Install CLI
         run: |
           cd packages/goldenpath-cli
+          uv venv
           uv pip install -e ".[dev]"
 
       - name: CLI smoke test
         run: |
+          source packages/goldenpath-cli/.venv/bin/activate
           cd /tmp
           goldenpath init --name smoke-test --language python --work-id FIN-999
           cd smoke-test
