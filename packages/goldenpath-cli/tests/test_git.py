@@ -1,15 +1,13 @@
 """Test Git governance validation."""
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-from git import Repo
 
 from goldenpath_cli.config import ProjectConfig
 from goldenpath_cli.git import (
     GitValidationError,
-    ValidationResult,
     get_repo,
     validate_branch_name,
     validate_pr_template,

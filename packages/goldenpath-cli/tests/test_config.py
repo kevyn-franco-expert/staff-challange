@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from goldenpath_cli.config import GitConfig, ProjectConfig, load_config
+from goldenpath_cli.config import load_config
 
 
 class TestLoadConfig:

@@ -43,7 +43,9 @@ class TestDoraTelemetry:
         metrics = telemetry.compute_metrics()
         assert metrics == {}
 
-    def test_compute_metrics_with_data(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_compute_metrics_with_data(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Metrics should aggregate correctly."""
         monkeypatch.chdir(tmp_path)
         config = DoraConfig(local_metrics_path=".goldenpath/dora.jsonl")
