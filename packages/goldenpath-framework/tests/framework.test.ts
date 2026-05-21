@@ -79,6 +79,7 @@ describe('Integration Pipeline Generator', () => {
     });
 
     expect(workflow.on).toHaveProperty('push');
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     expect((workflow.on as Record<string, unknown>).push).toEqual(
       expect.objectContaining({ branches: ['main'] })
     );
@@ -142,6 +143,7 @@ describe('ServiceStack', () => {
     const lambda = template.findResources('AWS::Lambda::Function');
     const handlerKey = Object.keys(lambda).find((k) => k.startsWith('Handler'));
     expect(handlerKey).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const tags = lambda[handlerKey!].Properties.Tags as Array<{ Key: string; Value: string }>;
     const tagMap = Object.fromEntries(tags.map((t) => [t.Key, t.Value]));
     expect(tagMap['service']).toBe('test-service');

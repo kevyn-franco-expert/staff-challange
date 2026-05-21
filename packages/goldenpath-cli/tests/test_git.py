@@ -72,9 +72,7 @@ class TestValidatePrTemplate:
         github_dir = tmp_path / ".github"
         github_dir.mkdir()
         template = github_dir / "PULL_REQUEST_TEMPLATE.md"
-        template.write_text(
-            "## Description\n## Work ID\n## Testing\n## Checklist\n", encoding="utf-8"
-        )
+        template.write_text("## Description\n## Work ID\n## Testing\n## Checklist\n", encoding="utf-8")
 
         result = validate_pr_template(tmp_path)
         assert result.passed is True

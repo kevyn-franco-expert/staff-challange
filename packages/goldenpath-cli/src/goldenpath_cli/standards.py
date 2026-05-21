@@ -33,7 +33,7 @@ class StandardsCheck:
         return {
             "rule": f"file:{name}",
             "passed": passed,
-            "message": f"{'✓' if exists else '✗'} {name} {'found' if exists else 'missing'} at {path}",
+            "message": (f"{'✓' if exists else '✗'} {name} {'found' if exists else 'missing'} at {path}"),
             "severity": severity,
             "path": str(path),
         }
@@ -48,19 +48,25 @@ class StandardsCheck:
         ]
 
         if self.config.language == "python":
-            checks.extend([
-                ("pyproject.toml", self.repo_path / "pyproject.toml", True),
-                ("tests/", self.repo_path / "tests", True),
-            ])
+            checks.extend(
+                [
+                    ("pyproject.toml", self.repo_path / "pyproject.toml", True),
+                    ("tests/", self.repo_path / "tests", True),
+                ]
+            )
         elif self.config.language in ("typescript", "javascript"):
-            checks.extend([
-                ("package.json", self.repo_path / "package.json", True),
-                ("tsconfig.json", self.repo_path / "tsconfig.json", False),
-            ])
+            checks.extend(
+                [
+                    ("package.json", self.repo_path / "package.json", True),
+                    ("tsconfig.json", self.repo_path / "tsconfig.json", False),
+                ]
+            )
         elif self.config.language == "go":
-            checks.extend([
-                ("go.mod", self.repo_path / "go.mod", True),
-            ])
+            checks.extend(
+                [
+                    ("go.mod", self.repo_path / "go.mod", True),
+                ]
+            )
 
         return [self._check_file_exists(name, path, req) for name, path, req in checks]
 
@@ -79,13 +85,15 @@ class StandardsCheck:
         # Check for CODEOWNERS
         codeowners = self.repo_path / ".github" / "CODEOWNERS"
         exists = codeowners.exists()
-        results.append({
-            "rule": "security:codeowners",
-            "passed": exists,
-            "message": f"{'✓' if exists else '✗'} CODEOWNERS {'found' if exists else 'missing'}",
-            "severity": "error" if not exists else "info",
-            "path": str(codeowners),
-        })
+        results.append(
+            {
+                "rule": "security:codeowners",
+                "passed": exists,
+                "message": f"{'✓' if exists else '✗'} CODEOWNERS {'found' if exists else 'missing'}",
+                "severity": "error" if not exists else "info",
+                "path": str(codeowners),
+            }
+        )
 
         return results
 
@@ -93,13 +101,15 @@ class StandardsCheck:
         """Validate DORA telemetry is configured."""
         results = []
         dora_path = self.repo_path / ".goldenpath"
-        results.append({
-            "rule": "dora:directory",
-            "passed": dora_path.exists(),
-            "message": f"{'✓' if dora_path.exists() else '✗'} .goldenpath directory exists",
-            "severity": "warning" if not dora_path.exists() else "info",
-            "path": str(dora_path),
-        })
+        results.append(
+            {
+                "rule": "dora:directory",
+                "passed": dora_path.exists(),
+                "message": f"{'✓' if dora_path.exists() else '✗'} .goldenpath directory exists",
+                "severity": "warning" if not dora_path.exists() else "info",
+                "path": str(dora_path),
+            }
+        )
         return results
 
     def run_all(self, strict: bool = False) -> bool:

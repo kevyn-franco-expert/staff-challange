@@ -217,7 +217,7 @@ class DoraTelemetry:
             return {}
 
         events: list[dict[str, Any]] = []
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if line:
@@ -233,13 +233,9 @@ class DoraTelemetry:
         recoveries = [e for e in events if e["event_type"] == "recovery"]
 
         deployment_frequency = len(deployments)
-        avg_lead_time = (
-            sum(c["duration_seconds"] for c in changes) / len(changes) if changes else 0.0
-        )
+        avg_lead_time = sum(c["duration_seconds"] for c in changes) / len(changes) if changes else 0.0
         change_failure_rate = len(failures) / len(deployments) if deployments else 0.0
-        avg_mttr = (
-            sum(r["duration_seconds"] for r in recoveries) / len(recoveries) if recoveries else 0.0
-        )
+        avg_mttr = sum(r["duration_seconds"] for r in recoveries) / len(recoveries) if recoveries else 0.0
 
         return {
             "period_days": days,

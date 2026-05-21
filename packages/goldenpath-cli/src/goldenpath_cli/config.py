@@ -77,7 +77,7 @@ def load_yaml(path: Path) -> dict[str, Any]:
     """Safely load YAML file."""
     if not path.exists():
         return {}
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
 
@@ -143,8 +143,6 @@ def load_config(path: Path | None = None) -> ProjectConfig:
             localstack_services=tuple(
                 raw.get("local_env", {}).get("localstack_services", LocalEnvConfig.localstack_services)
             ),
-            docker_compose_path=raw.get("local_env", {}).get(
-                "docker_compose_path", "docker-compose.local.yml"
-            ),
+            docker_compose_path=raw.get("local_env", {}).get("docker_compose_path", "docker-compose.local.yml"),
         ),
     )

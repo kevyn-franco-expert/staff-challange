@@ -18,9 +18,7 @@ class TestCreateBranch:
         import subprocess
 
         subprocess.run(["git", "init"], check=True, capture_output=True)
-        subprocess.run(
-            ["git", "config", "user.email", "test@test.com"], check=True, capture_output=True
-        )
+        subprocess.run(["git", "config", "user.email", "test@test.com"], check=True, capture_output=True)
         subprocess.run(["git", "config", "user.name", "Test"], check=True, capture_output=True)
         # Create initial commit so we can branch
         (tmp_path / "README.md").write_text("# test", encoding="utf-8")

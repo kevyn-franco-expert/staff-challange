@@ -39,8 +39,9 @@ export function toGitHubActionsYAML(definition: WorkflowDefinition): string {
 /**
  * Write workflow definition to a file.
  */
+import * as fs from 'fs';
+
 export function writeWorkflow(definition: WorkflowDefinition, filePath: string): void {
-  const fs = require('fs');
   const yamlContent = toGitHubActionsYAML(definition);
   fs.writeFileSync(filePath, yamlContent, 'utf-8');
 }

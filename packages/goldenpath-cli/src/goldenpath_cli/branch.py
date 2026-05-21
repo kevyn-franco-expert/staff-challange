@@ -34,10 +34,7 @@ def create_branch(config: ProjectConfig, work_id: str, branch_type: str, descrip
 
     # Validate branch type
     if branch_type not in config.git.allowed_branch_prefixes:
-        raise ValueError(
-            f"Branch type '{branch_type}' not allowed. "
-            f"Use: {config.git.allowed_branch_prefixes}"
-        )
+        raise ValueError(f"Branch type '{branch_type}' not allowed. Use: {config.git.allowed_branch_prefixes}")
 
     # Sanitize description
     clean_desc = description.lower().replace(" ", "-").replace("_", "-")

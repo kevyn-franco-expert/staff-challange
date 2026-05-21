@@ -14,15 +14,14 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
 from rich.panel import Panel
-from rich.text import Text
 
+from goldenpath_cli.branch import create_branch
 from goldenpath_cli.config import ProjectConfig, load_config
-from goldenpath_cli.dora import DoraEvent, DoraTelemetry
+from goldenpath_cli.dora import DoraTelemetry
 from goldenpath_cli.git import (
     get_git_info,
     get_repo,
@@ -30,7 +29,6 @@ from goldenpath_cli.git import (
     validate_commit_messages,
     validate_pr_template,
 )
-from goldenpath_cli.branch import create_branch
 from goldenpath_cli.hooks import HookManager
 from goldenpath_cli.local_env import LocalEnvBootstrap
 from goldenpath_cli.standards import StandardsCheck
@@ -56,10 +54,10 @@ def version_callback(value: bool) -> None:
 @app.callback()
 def main(
     ctx: typer.Context,
-    version: Optional[bool] = typer.Option(  # noqa: UP007
+    version: bool | None = typer.Option(  # noqa: UP007
         None, "--version", "-v", callback=version_callback, is_eager=True
     ),
-    config: Optional[Path] = typer.Option(  # noqa: UP007
+    config: Path | None = typer.Option(  # noqa: UP007
         None, "--config", "-c", help="Path to goldenpath.yaml config file"
     ),
 ) -> None:
@@ -76,7 +74,7 @@ def init(
     name: str = typer.Option(..., help="Service name"),
     language: str = typer.Option("python", help="Primary language (python, go, typescript, clojure)"),
     work_id: str = typer.Option(..., help="Initial Work ID (e.g., FIN-123)"),
-    path: Optional[Path] = typer.Option(None, help="Target directory (default: ./<name>)"),  # noqa: UP007
+    path: Path | None = typer.Option(None, help="Target directory (default: ./<name>)"),  # noqa: UP007
 ) -> None:
     """Initialize a new service with Golden Path scaffolding."""
     target = path or Path(name)
@@ -92,7 +90,7 @@ def init(
     config_content = f"""project:
   name: {name}
   language: {language}
-  work_id_prefix: {work_id.split('-')[0]}
+  work_id_prefix: {work_id.split("-")[0]}
 
 git:
   main_branch: main
@@ -153,13 +151,15 @@ cdk.out/
 """
     (target / ".gitignore").write_text(gitignore, encoding="utf-8")
 
-    console.print(Panel.fit(
-        f"[bold green]✅ Initialized Golden Path service: {name}[/bold green]\n"
-        f"[dim]Language:[/dim] {language}\n"
-        f"[dim]Work ID:[/dim] {work_id}\n"
-        f"[dim]Path:[/dim] {target.resolve()}",
-        title="goldenpath init",
-    ))
+    console.print(
+        Panel.fit(
+            f"[bold green]✅ Initialized Golden Path service: {name}[/bold green]\n"
+            f"[dim]Language:[/dim] {language}\n"
+            f"[dim]Work ID:[/dim] {work_id}\n"
+            f"[dim]Path:[/dim] {target.resolve()}",
+            title="goldenpath init",
+        )
+    )
     console.print("\n[bold]Next steps:[/bold]")
     console.print(f"  cd {target}")
     console.print("  goldenpath hooks install")
@@ -176,7 +176,7 @@ def standards(
     check: bool = typer.Option(True, "--check/--no-check", help="Run standards check"),
 ) -> None:
     """Validate project against Golden Path standards."""
-    
+
     config: ProjectConfig = ctx.obj["config"]
 
     if not check:
@@ -200,7 +200,7 @@ def validate_work_id(
     ctx: typer.Context,
 ) -> None:
     """Validate Work ID compliance in current branch and commits."""
-    
+
     config: ProjectConfig = ctx.obj["config"]
 
     repo = get_repo()
@@ -234,7 +234,7 @@ def validate_pr(
     ctx: typer.Context,
 ) -> None:
     """Validate PR template and governance settings."""
-    
+
     config: ProjectConfig = ctx.obj["config"]
 
     template_result = validate_pr_template()
@@ -262,7 +262,7 @@ def branch(
     description: str = typer.Option(..., help="Short description"),
 ) -> None:
     """Create a standardized branch with Work ID enforcement."""
-    
+
     config: ProjectConfig = ctx.obj["config"]
 
     try:
@@ -304,11 +304,11 @@ app.add_typer(dora_app, name="dora")
 @dora_app.command("report")
 def dora_report(
     ctx: typer.Context,
-    project: Optional[str] = typer.Option(None, help="Filter by project name"),  # noqa: UP007
+    project: str | None = typer.Option(None, help="Filter by project name"),  # noqa: UP007
     days: int = typer.Option(30, help="Analysis period in days"),
 ) -> None:
     """Generate DORA metrics report from local telemetry."""
-    
+
     config: ProjectConfig = ctx.obj["config"]
     telemetry = DoraTelemetry(config.dora)
 
@@ -317,16 +317,18 @@ def dora_report(
         console.print("[yellow]No DORA events found. Run validations to generate telemetry.[/yellow]")
         return
 
-    console.print(Panel.fit(
-        f"[bold]DORA Metrics Report[/bold]\n"
-        f"Period: {metrics['period_days']} days | Project: {metrics['project']}\n\n"
-        f"  Deployment Frequency:      {metrics['deployment_frequency']}\n"
-        f"  Lead Time (hours):         {metrics['lead_time_for_changes_hours']}\n"
-        f"  Change Failure Rate:       {metrics['change_failure_rate']:.2%}\n"
-        f"  Mean Time To Recovery (h): {metrics['mean_time_to_recovery_hours']}\n\n"
-        f"[dim]Audit Compliance: {metrics['audit_trail_compliance']}[/dim]",
-        title="DORA",
-    ))
+    console.print(
+        Panel.fit(
+            f"[bold]DORA Metrics Report[/bold]\n"
+            f"Period: {metrics['period_days']} days | Project: {metrics['project']}\n\n"
+            f"  Deployment Frequency:      {metrics['deployment_frequency']}\n"
+            f"  Lead Time (hours):         {metrics['lead_time_for_changes_hours']}\n"
+            f"  Change Failure Rate:       {metrics['change_failure_rate']:.2%}\n"
+            f"  Mean Time To Recovery (h): {metrics['mean_time_to_recovery_hours']}\n\n"
+            f"[dim]Audit Compliance: {metrics['audit_trail_compliance']}[/dim]",
+            title="DORA",
+        )
+    )
 
 
 @dora_app.command("emit-validation")
@@ -336,7 +338,7 @@ def dora_emit_validation(
     success: bool = typer.Option(True, help="Validation outcome"),
 ) -> None:
     """Manually emit a validation DORA event."""
-    
+
     config: ProjectConfig = ctx.obj["config"]
     telemetry = DoraTelemetry(config.dora)
 
@@ -371,7 +373,7 @@ def local_env(
     up: bool = typer.Option(False, "--up", help="Start docker-compose (requires bootstrap first)"),
 ) -> None:
     """Manage local development environment."""
-    
+
     config: ProjectConfig = ctx.obj["config"]
 
     if bootstrap:
@@ -381,7 +383,7 @@ def local_env(
         import subprocess
 
         compose_file = config.local_env.docker_compose_path
-        console.print(f"[bold]Starting local environment...[/bold]")
+        console.print("[bold]Starting local environment...[/bold]")
         try:
             subprocess.run(
                 ["docker-compose", "-f", compose_file, "up", "-d"],

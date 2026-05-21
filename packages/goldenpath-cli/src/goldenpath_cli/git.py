@@ -35,9 +35,7 @@ class ValidationResult:
     metadata: dict[str, Any] = None  # type: ignore[assignment]
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self, "metadata", self.metadata if self.metadata is not None else {}
-        )
+        object.__setattr__(self, "metadata", self.metadata if self.metadata is not None else {})
 
 
 def get_repo(path: Path | None = None) -> Repo:
@@ -72,7 +70,7 @@ def validate_branch_name(config: ProjectConfig, repo: Repo | None = None) -> Val
         return ValidationResult(
             passed=False,
             rule="branch-prefix",
-            message=f"Branch type '{branch_type}' not allowed. Use: {config.git.allowed_branch_prefixes}",
+            message=(f"Branch type '{branch_type}' not allowed. Use: {config.git.allowed_branch_prefixes}"),
             severity="error",
             metadata={"branch": branch, "allowed": config.git.allowed_branch_prefixes},
         )
@@ -84,7 +82,7 @@ def validate_branch_name(config: ProjectConfig, repo: Repo | None = None) -> Val
         return ValidationResult(
             passed=False,
             rule="work-id-in-branch",
-            message=f"Work ID not found in '{work_id_segment}'. Expected pattern: {pattern.pattern}",
+            message=(f"Work ID not found in '{work_id_segment}'. Expected pattern: {pattern.pattern}"),
             severity="error",
             metadata={"branch": branch, "segment": work_id_segment},
         )
