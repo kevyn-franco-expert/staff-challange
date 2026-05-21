@@ -1,10 +1,19 @@
 # =============================================================================
-# AI-Assisted PR Review
-# Demonstrates integration point for Amazon Q Developer automated analysis.
-# In production, the heuristic scan below is replaced by Amazon Q Developer
-# API calls (via AWS SDK) after configuring credentials.
+# Amazon Q Developer — AI-Assisted PR Review
 # =============================================================================
-name: AI-Assisted PR Review
+# Amazon Q Developer provides AI-powered code analysis through TWO channels:
+#
+# 1. GitHub App (Recommended for teams):
+#    Install "Amazon Q Developer" from the GitHub Marketplace.
+#    It adds AI review comments directly on PRs — no workflow needed.
+#    Docs: https://aws.amazon.com/q/developer/
+#
+# 2. CI/CD Integration (this workflow):
+#    Uses AWS CodeGuru Security (part of the Amazon Q Developer family)
+#    to scan code for vulnerabilities and anti-patterns on every PR.
+#    Findings appear in the GitHub Security tab + AWS Console.
+# =============================================================================
+name: Amazon Q Developer — Security Review
 
 on:
   pull_request:
@@ -13,11 +22,12 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
+  security-events: write
+  id-token: write
 
 jobs:
-  ai-pr-review:
-    name: Heuristic PR Scan
+  codeguru-security-scan:
+    name: AI Security Scan (CodeGuru)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,53 +36,63 @@ jobs:
           fetch-depth: 0
 
       # -----------------------------------------------------------------------
-      # Production integration: Replace the script below with Amazon Q Developer
-      # calls using aws-actions/configure-aws-credentials + AWS SDK.
-      # Amazon Q analyzes diff, detects security anti-patterns, and suggests
-      # fixes directly as PR review comments.
+      # Prerequisites for this workflow:
+      # 1. Create an IAM Role for GitHub Actions OIDC
+      # 2. Attach policy: AmazonCodeGuruSecurityScanAccess
+      # 3. Store role ARN in secret: AWS_CODEGURU_ROLE_ARN
       # -----------------------------------------------------------------------
-      - name: PR Heuristic Analysis
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_CODEGURU_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Amazon Q Developer — CodeGuru Security Scan
+        uses: aws-actions/codeguru-security@v1
+        with:
+          source_path: .
+          aws_region: us-east-1
+          fail_on_severity: Critical
+
+      - name: Upload findings to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: codeguru-security-results.sarif.json
+
+      - name: Post PR Summary
+        if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            const { data: files } = await github.rest.pulls.listFiles({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-            });
-
-            const findings = [];
-            let totalLines = 0;
-
-            for (const f of files) {
-              totalLines += f.additions + f.deletions;
-              // Detect secrets (basic heuristic)
-              if (/password|secret|token|api.key/i.test(f.patch || '')) {
-                findings.push(`🔒 **Potential secret in** \`${f.filename}\` — review manually`);
-              }
-              // Detect large files
-              if (f.additions + f.deletions > 500) {
-                findings.push(`📦 **Large change** in \`${f.filename}\` (${f.additions + f.deletions} lines) — consider splitting`);
-              }
+            const fs = require('fs');
+            let findings = 'No findings file generated.';
+            try {
+              const raw = fs.readFileSync('codeguru-security-results.sarif.json', 'utf8');
+              const sarif = JSON.parse(raw);
+              const count = sarif.runs?.[0]?.results?.length ?? 0;
+              findings = count === 0
+                ? '✅ No security findings detected by Amazon Q Developer (CodeGuru).'
+                : `⚠️ ${count} finding(s) detected. View details in the **Security → Code scanning** tab.`;
+            } catch {
+              findings = 'ℹ️ Scan completed. Install the Amazon Q Developer GitHub App for inline PR reviews.';
             }
 
-            const summary = `
-            ## 🤖 AI-Assisted PR Review
+            const body = `## 🤖 Amazon Q Developer — AI Security Review
 
-            ${findings.length > 0
-              ? findings.join('\n')
-              : '✅ No obvious issues detected by heuristic scan.'}
+            ${findings}
 
             ---
-            **PR Stats**: ${files.length} files changed, ${totalLines} lines modified.
+            **What was scanned:** All source files in this PR  
+            **Engine:** AWS CodeGuru Security (part of Amazon Q Developer)  
+            **Next step:** Address any Critical/High findings before merge.
 
-            > **Note**: This is a PoC heuristic scan. In production, this step invokes **Amazon Q Developer**
-            > for deep security analysis, performance anti-pattern detection, and best-practice recommendations.
+            > 💡 **Pro tip:** Install the [Amazon Q Developer GitHub App](https://github.com/marketplace?q=amazon+q+developer) for real-time AI review comments on every PR without CI latency.
             `;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: summary
+              body: body
             });
