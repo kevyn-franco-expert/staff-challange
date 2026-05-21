@@ -63,7 +63,7 @@ networks:
 LOCALSTACK_INIT_SCRIPT = """#!/bin/bash
 # =============================================================================
 # LocalStack Initialization Script
-# Run after `docker-compose up` to seed initial resources
+# Run after `docker compose up` to seed initial resources
 # =============================================================================
 
 set -e
@@ -106,7 +106,7 @@ class LocalEnvBootstrap:
         self.local_config = config.local_env
 
     def generate_docker_compose(self, output_path: Path | None = None) -> Path:
-        """Generate docker-compose.local.yml."""
+        """Generate docker-compose.local.yml (uses modern `docker compose` plugin)."""
         path = output_path or Path(self.local_config.docker_compose_path)
         services = ",".join(self.local_config.localstack_services)
         content = DOCKER_COMPOSE_TEMPLATE.format(services=services)
@@ -139,6 +139,6 @@ class LocalEnvBootstrap:
         self.generate_test_config()
         console.print("[bold green]✅ Local environment ready![/bold green]")
         console.print("\nNext steps:")
-        console.print("  1. docker-compose -f docker-compose.local.yml up -d")
+        console.print("  1. docker compose -f docker-compose.local.yml up -d")
         console.print("  2. ./scripts/init-localstack.sh")
         console.print("  3. Run tests locally with no cloud latency")

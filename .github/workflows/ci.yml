@@ -45,6 +45,7 @@ jobs:
         with:
           files: packages/goldenpath-cli/coverage.xml
           flags: cli
+          fail_ci_if_error: false
 
   lint-cli:
     name: Lint CLI

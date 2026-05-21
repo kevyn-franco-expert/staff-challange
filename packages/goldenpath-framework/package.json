@@ -15,7 +15,6 @@
   },
   "packageManager": "pnpm@8.15.0",
   "scripts": {
-    "prepare": "tsc",
     "build": "tsc",
     "watch": "tsc -w",
     "test": "vitest run",
