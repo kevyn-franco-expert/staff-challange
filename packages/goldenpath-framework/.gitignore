@@ -1,0 +1,2 @@
+# Do not ignore dist/ in this package — required for distribution
+!dist/

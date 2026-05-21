@@ -1,0 +1,66 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+__pycache__/
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# Build artifacts & cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.tsbuildinfo
+
+# PDF generation fonts (auto-downloaded by script)
+fonts/
+
+# Local environment
+.localstack/
+.goldenpath/dora.jsonl
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CDK
+.cdk.staging/
+cdk.out/
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary
+tmp/
+temp/
+*.tmp

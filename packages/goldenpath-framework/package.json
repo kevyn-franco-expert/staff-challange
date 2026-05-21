@@ -1,0 +1,67 @@
+{
+  "name": "@gila-software/goldenpath-framework",
+  "version": "0.1.0",
+  "description": "Golden Path Framework — Type-safe CI/CD and Infrastructure patterns for AWS CDK",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "templates",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "scripts": {
+    "prepare": "tsc",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src/ tests/ --ext .ts",
+    "lint:fix": "eslint src/ tests/ --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "generate-workflows": "tsx scripts/generate-workflows.ts"
+  },
+  "peerDependencies": {
+    "aws-cdk-lib": "^2.130.0",
+    "constructs": "^10.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "aws-cdk-lib": "^2.130.0",
+    "constructs": "^10.3.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0",
+    "yaml": "^2.3.0"
+  },
+  "dependencies": {
+    "yaml": "^2.3.0"
+  },
+  "keywords": [
+    "cdk",
+    "aws",
+    "golden-path",
+    "cicd",
+    "github-actions",
+    "platform",
+    "devex"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gila-software/goldenpath-platform.git",
+    "directory": "packages/goldenpath-framework"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
+}

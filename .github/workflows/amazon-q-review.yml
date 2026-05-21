@@ -1,0 +1,75 @@
+# =============================================================================
+# Amazon Q Developer — Automated PR Review
+# Integrates AI-powered code analysis for security, quality, and best practices
+# =============================================================================
+name: Amazon Q Developer Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  amazon-q-review:
+    name: AI PR Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure AWS Credentials (for Amazon Q)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_AMAZON_Q_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Amazon Q Developer PR Review
+        uses: aws-actions/amazon-q-developer-pr-agent@v1
+        with:
+          # Scan for security vulnerabilities
+          security-scan: true
+          # Code quality analysis
+          code-quality: true
+          # Best practices validation
+          best-practices: true
+          # Generate summary comment
+          generate-comment: true
+          # Language detection
+          language: auto
+          # Exclude patterns
+          exclude: |
+            **/node_modules/**
+            **/__pycache__/**
+            **/dist/**
+            **/cdk.out/**
+
+      - name: Post Review Summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `
+            ## 🤖 Amazon Q Developer Review Complete
+
+            Amazon Q has analyzed this pull request for:
+            - 🔒 Security vulnerabilities
+            - 📊 Code quality issues
+            - 📖 Best practice violations
+            - 🏗️ Architecture patterns
+
+            Please review the inline comments and address any findings.
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });

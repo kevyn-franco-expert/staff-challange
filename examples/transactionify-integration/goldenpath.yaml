@@ -1,0 +1,30 @@
+project:
+  name: transactionify
+  language: python
+  work_id_prefix: FIN
+
+git:
+  main_branch: main
+  require_two_reviewers: true
+  enforce_pr_template: true
+  allowed_branch_prefixes:
+    - feature
+    - bugfix
+    - hotfix
+    - release
+    - chore
+
+dora:
+  enabled: true
+  audit_format: soc2
+  local_metrics_path: .goldenpath/dora.jsonl
+
+local_env:
+  use_localstack: true
+  localstack_services:
+    - lambda
+    - apigateway
+    - dynamodb
+    - sns
+    - sqs
+  docker_compose_path: docker-compose.local.yml
