@@ -70,8 +70,8 @@ function toGitHubActionsYAML(definition) {
 /**
  * Write workflow definition to a file.
  */
+const fs = __importStar(require("fs"));
 function writeWorkflow(definition, filePath) {
-    const fs = require('fs');
     const yamlContent = toGitHubActionsYAML(definition);
     fs.writeFileSync(filePath, yamlContent, 'utf-8');
 }

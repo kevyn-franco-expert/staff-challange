@@ -121,7 +121,7 @@ function generatePRPipeline(options) {
                 },
                 {
                     name: 'Validate Standards',
-                    run: 'goldenpath standards check --strict',
+                    run: 'goldenpath standards --strict',
                 },
                 {
                     name: 'Validate Work ID',

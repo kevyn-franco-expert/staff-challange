@@ -12,9 +12,6 @@ import { type WorkflowDefinition } from '../types/index.js';
  * @returns Valid GitHub Actions YAML string
  */
 export declare function toGitHubActionsYAML(definition: WorkflowDefinition): string;
-/**
- * Write workflow definition to a file.
- */
 export declare function writeWorkflow(definition: WorkflowDefinition, filePath: string): void;
 /**
  * Validate that a workflow definition has required fields.

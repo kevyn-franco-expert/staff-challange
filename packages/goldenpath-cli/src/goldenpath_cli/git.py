@@ -112,7 +112,10 @@ def validate_commit_messages(config: ProjectConfig, repo: Repo | None = None) ->
         commits = list(repo.iter_commits("HEAD", max_count=10))
 
     for commit in commits:
-        msg = commit.message.split("\n")[0]  # First line only
+        raw_msg = commit.message
+        msg = (
+            raw_msg.decode("utf-8").split("\n")[0] if isinstance(raw_msg, bytes) else raw_msg.split("\n")[0]
+        )  # First line only
         if not pattern.search(msg):
             results.append(
                 ValidationResult(
